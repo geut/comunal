@@ -1,0 +1,95 @@
+{
+  "name": "@geut/comunal",
+  "version": "0.0.1",
+  "description": "Template to create modules following the Geut path",
+  "files": [
+    "lib",
+    "bin",
+    "index.js"
+  ],
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "posttest": "npm run lint",
+    "build": "webpack -p",
+    "dist": "electron-builder",
+    "lint": "xd-ns \"**/*.js\"",
+    "start": "webpack-dev-server --progress --color",
+    "start:main": "electron .",
+    "version": "chan release --allow-yanked ${npm_package_version} && git add .",
+    "html-webpack-plugin": "^3.2.0",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "@geut/hyperdrive-promise": "^3.0.0",
+    "http-responders": "^1.0.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-multimedia-capture": "^1.2.4",
+    "react-router-dom": "^5.1.2",
+    "tailwindcss": "^1.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-react": "^7.9.1",
+    "@geut/chan": "^2.0.0",
+    "@geut/xd": "^1.5.0",
+    "autoprefixer": "^9.7.4",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^3.4.2",
+    "electron": "^7.1.14",
+    "electron-builder": "^21.2.0",
+    "electron-debug": "^3.0.1",
+    "electron-devtools-installer": "^2.2.4",
+    "html-webpack-plugin": "^3.2.0",
+    "jest": "^24.8.0",
+    "postcss": "^7.0.27",
+    "postcss-loader": "^3.0.0",
+    "prettier-standard": "^15.0.1",
+    "standard": "^14.3.1",
+    "style-loader": "^1.1.3",
+    "webpack": "^4.41.3",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "jest": {
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  },
+  "standard": {
+    "env": [
+      "jest",
+      "node",
+      "browser"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geut/comunal.git"
+  },
+  "keywords": [
+    "create",
+    "geut",
+    "module"
+  ],
+  "author": {
+    "name": "GEUT",
+    "email": "contact@geutstudio.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/geut/comunal/issues"
+  },
+  "homepage": "https://github.com/geut/comunal#readme",
+  "build": {
+    "files": [
+      "**/*",
+      "build/**/*"
+    ],
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
