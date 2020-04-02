@@ -1,6 +1,34 @@
 const hyperdrive = require('@geut/hyperdrive-promise')
+const WebSocket = require('ws')
 const http = require('http')
 const { json, stream } = require('http-responders')
+
+const WS_PORT = process.env.WS_PORT || 3001
+
+const wsServer = new WebSocket.Server({ port: WS_PORT }, () =>
+  console.log(`WS server is listening at ws://localhost:${WS_PORT}`)
+)
+
+let connectedClients = []
+
+wsServer.on('connection', (ws, req) => {
+  console.log('Connected')
+  // add new connected client
+  connectedClients.push(ws)
+  // listen for messages from the streamer, the clients will not send anything so we don't need to filter
+  ws.on('message', data => {
+    // send the base64 encoded frame to each connected ws
+    connectedClients.forEach((ws, i) => {
+      if (ws.readyState === ws.OPEN) {
+        // check if it is still connected
+        ws.send(data) // send
+      } else {
+        // if it's not connected remove from the array of connected ws
+        connectedClients.splice(i, 1)
+      }
+    })
+  })
+})
 
 const createServer = ({ drive }) => {
   const streamingServer = http.createServer((request, response) => {

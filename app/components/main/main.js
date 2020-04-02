@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Logo from '../logo/logo'
 import Stats from '../stats/stats'
-import Video from '../media/video'
+import Camera from '../media/camera'
 
 const Main = () => {
   const [data, setData] = useState({ drive: null })
@@ -24,7 +24,7 @@ const Main = () => {
       <Logo />
       <Stats driveData={data.drive} />
       <div className='my-2'>
-        <Video />
+        <Camera />
       </div>
     </div>
   )
