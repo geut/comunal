@@ -7,14 +7,14 @@ import theme from './styles/theme';
 
 import App from './containers/App';
 
-import hypercore from 'hypercore';
-import storage from 'random-access-idb';
+// import hypercore from 'hypercore';
+// import storage from 'random-access-idb';
 
-const feed = hypercore(storage('thet'), { valueEncoding: 'utf-8' });
+// const feed = hypercore(storage('thet'), { valueEncoding: 'utf-8' });
 
-feed.append('hola', () => {
-  feed.get(0, console.log);
-});
+// feed.append('hola', () => {
+//   feed.get(0, console.log);
+// });
 
 const root = document.getElementById('root');
 

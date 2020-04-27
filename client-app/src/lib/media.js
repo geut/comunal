@@ -102,7 +102,6 @@ export const enhanceStream = (stream, getInfoCB) => {
   stream.events = new EventEmitter();
 
   stream.events.on('track-added', event => {
-    console.log('track added', event.track.getSettings());
     registerTrackHandlers(event.track.kind, [event.track]);
   });
 

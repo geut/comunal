@@ -10,6 +10,8 @@ import { SIGNAL_URL } from '../config';
 
 import { enhanceStream } from './media';
 
+const MESSAGE_TYPE_STREAM_INFO = 'stream.info';
+
 class Swarm extends EventEmitter {
   _swarm = null;
   _peers = new Map();
@@ -78,21 +80,24 @@ class Swarm extends EventEmitter {
   };
 
   _handlePeerStream = peerId => peerStream => {
-    console.log('swarm:peer:stream', peerStream);
-
     const stream = enhanceStream(peerStream, () => {
-      const streams = this._peers.get(peerId).streams;
+      const { streams } = this._peers.get(peerId);
       const { info } = streams.get(peerStream.id);
       return info;
     });
 
     const peer = this._peers.get(peerId);
 
-    const peerStreamEntry = peer.streams.get(peerStream.id);
+    let peerStreamEntry = peer.streams.get(stream.id);
 
     if (!peerStreamEntry) {
-      peer.streams.set(stream.id, { stream });
+      peer.streams.set(stream.id, {});
+      peerStreamEntry = peer.streams.get(stream.id);
     }
+
+    peerStreamEntry.stream = stream;
+
+    peer.streams.set(stream.id, peerStreamEntry);
 
     this._peers.set(peerId, peer);
 
@@ -100,19 +105,22 @@ class Swarm extends EventEmitter {
   };
 
   _handlePeerData = peerId => peerData => {
-    console.log('swarm:peer:data', peerData);
-    const data = JSON.parse(peerData.toString());
-    console.log(data);
+    const { type, data } = JSON.parse(peerData.toString());
 
-    if (data.type === 'stram.info') {
+    console.log(type, data);
+
+    if (type === MESSAGE_TYPE_STREAM_INFO) {
       const peer = this._peers.get(peerId);
-      const peerStream = peer.streams.get(data.id);
+      let peerStreamEntry = peer.streams.get(data.id);
 
-      if (!peerStream) {
-        peer.streams.set({
-          info: data.info
-        });
+      if (!peerStreamEntry) {
+        peer.streams.set(data.id, {});
+        peerStreamEntry = peer.streams.get(data.id);
       }
+
+      peerStreamEntry.info = data.info;
+
+      peer.streams.set(data.id, peerStreamEntry);
 
       this._peers.set(peerId, peer);
     }
@@ -139,7 +147,7 @@ class Swarm extends EventEmitter {
       try {
         if (added) {
           peer.addStream(stream);
-          peer.send(JSON.stringify({ type: 'stream.info', data: { id: stream.id, info: stream.getInfo() } }));
+          peer.send(JSON.stringify({ type: MESSAGE_TYPE_STREAM_INFO, data: { id: stream.id, info: stream.getInfo() } }));
         } else {
           peer.removeStream(stream);
         }

@@ -27,38 +27,29 @@ const useStyles = makeStyles(theme => ({
 
   },
 
-  videoStream: ({ min, max }) => ({
-    flex: 1,
-    overflow: 'hidden',
-    paddingTop: `calc(${min} / ${max} * 100%)`
+  videoStream: ({ width, height }) => ({
+    display: 'flex',
+    width: 'auto',
+    height
   }),
 
-  videoSize: ({ width, height }) => ({
-    width,
-    height
+  videoSize: ({ width, height, min, max }) => ({
+    // paddingTop: `calc(${min} / ${max} * 100%)`,
+    width: 'auto',
+    height: '-webkit-fill-available'
   })
 }));
 
 const PeerView = ({ stream }) => {
   if (!stream) return null;
 
-  // console.log(stream.getActiveVideoTrack().getSettings());
-  // console.log(stream.getActiveVideoTrack().getConstraints());
-  stream.events.on('track-update', track => console.log(track.getSettings()));
-  stream.events.on('add-track', track => console.log(track.getSettings()));
+  const { video: { settings: { width, height } } } = stream.getInfo();
 
-  const { width, height } = stream.getActiveVideoTrack().getSettings();
-  // console.log({
-  //   min: Math.min(width, height),
-  //   max: Math.min(width, height),
-  //   width: width > height ? width : undefined,
-  //   height: height > width ? height : undefined
-  // });
   const classes = useStyles({
     min: Math.min(width, height),
-    max: Math.min(width, height),
-    width: width > height ? width : undefined,
-    height: height > width ? height : undefined
+    max: Math.max(width, height),
+    width: width > height ? '100%' : undefined,
+    height: height > width ? '100%' : undefined
   });
   const boxShadowClasses = useBoxShadowStyles();
   const video = useRef(null);
@@ -68,13 +59,12 @@ const PeerView = ({ stream }) => {
   }, []);
 
   return (
-    <div className={classnames(classes.videoStream, classes.videoSize, boxShadowClasses.boxShadow)}>
+    <div className={classnames(classes.videoStream, boxShadowClasses.boxShadow)}>
       <video
         autoPlay
         ref={video}
-      // className={classnames(classes.videoSize)}
+        className={classnames(classes.videoSize)}
       />
-      {/* <div className={classnames(classes.videoSize)} style={{ backgroundColor: 'grey' }}>AAAA</div> */}
     </div>
   );
 };
@@ -93,7 +83,7 @@ const PeersView = ({ peers = [] }) => {
       >
         {peers.map(peer => (
           Array.from(peer.streams.values()).map(({ stream }) => (
-            <Grid item container xs className={classes.peersGridItem} key={stream.id}>
+            <Grid item container justify="center" alignItems="center" xs className={classes.peersGridItem} key={stream.id}>
               <PeerView stream={stream} />
             </Grid>
           ))
