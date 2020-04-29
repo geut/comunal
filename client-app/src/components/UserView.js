@@ -86,7 +86,7 @@ const trackIcons = {
   }
 };
 
-const VideoStreamActionButtons = ({ stream }) => {
+const VideoStreamActionButtons = ({ stream, onAudioChange, onVideoChange }) => {
   const classes = useStyles();
 
   const [tracksStatus, setTracksStatus] = useState({
@@ -114,7 +114,7 @@ const VideoStreamActionButtons = ({ stream }) => {
 
   const handleTrackClick = useCallback(kind => () => {
     const track = tracksStatus[kind];
-    track.setEnabled(!track.enabled);
+    (kind === 'audio' ? onAudioChange : onVideoChange)(!track.enabled);
   }, [tracksStatus]);
 
   return (
@@ -164,7 +164,9 @@ const VideoStreamActionButtons = ({ stream }) => {
 
 const VideoStream = ({
   stream,
-  boxSize
+  boxSize,
+  onAudioChange,
+  onVideoChange
 }) => {
   const { width, height, aspectRatio } = stream.getActiveVideoTrack().getSettings();
 
@@ -195,6 +197,8 @@ const VideoStream = ({
         <VideoStreamActionButtons
           className={'hideable'}
           stream={stream}
+          onAudioChange={onAudioChange}
+          onVideoChange={onVideoChange}
         />
       )}
       <video
@@ -208,7 +212,7 @@ const VideoStream = ({
 };
 
 const MAX_BOX_HEIGHT = 150;
-const UserView = ({ streams = [] }) => {
+const UserView = ({ streams = [], onAudioChange, onVideoChange }) => {
   const classes = useStyles({ height: MAX_BOX_HEIGHT });
   const visibleClasses = useVisibleStyles();
 
@@ -230,6 +234,8 @@ const UserView = ({ streams = [] }) => {
             stream={stream}
             key={stream.id}
             boxSize={MAX_BOX_HEIGHT}
+            onAudioChange={onAudioChange(stream)}
+            onVideoChange={onVideoChange(stream)}
           />
         );
       })}

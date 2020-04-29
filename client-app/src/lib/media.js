@@ -56,6 +56,26 @@ export const getDisplayMedia = async () => {
   return enhanceStream(stream);
 };
 
+const getMediaDevices = async (kind) => {
+  const devices = await enumerateDevices();
+
+  if (kind) {
+    return devices.filter(device => device.kind === kind);
+  }
+};
+
+export const getAudioInputDevices = async () => {
+  return getMediaDevices('audioinput');
+};
+
+export const getAudioOutputDevices = async () => {
+  return getMediaDevices('audiooutput');
+};
+
+export const getVideoInputDevices = async () => {
+  return getMediaDevices('videoinput');
+};
+
 /**
  * @param {MediaStream} stream
  */
@@ -88,6 +108,8 @@ export const isVideoTrackEnabled = stream => {
 export const enhanceStream = (stream, getInfoCB) => {
   const registerTrackHandlers = (kind, tracks = []) => {
     tracks.map(track => {
+      track.getStream = () => stream;
+
       track.setEnabled = (enabled = true) => {
         track.enabled = enabled;
         stream.events.emit('track-update', track, { kind, type: 'enabled' });
@@ -119,6 +141,10 @@ export const enhanceStream = (stream, getInfoCB) => {
   stream.getActiveVideoTrack = () => {
     // TODO: get from config
     return stream.getVideoTracks()[0];
+  };
+
+  stream.getActiveTrack = kind => {
+    return kind === 'audio' ? stream.getActiveAudioTrack() : stream.getActiveVideoTrack();
   };
 
   stream.getActiveTrack = (kind) => {

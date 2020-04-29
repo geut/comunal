@@ -1,3 +1,13 @@
-export const SIGNAL_URL = localStorage.getItem('config.signal.url') || 'ws://localhost:4000';
-export const USER_VIDEO_ENABLED = localStorage.getItem('config.user.video.enabled') || true;
-export const USER_AUDIO_ENABLED = localStorage.getItem('config.user.audio.enabled') || true;
+
+const localOrDefault = (key, defaultValue) => {
+  const value = localStorage.getItem(key);
+  return (value !== null) ? JSON.parse(value) : defaultValue;
+};
+
+export const SIGNAL_URL = localOrDefault('signal.url', process.env.SIGNAL_URL);
+export const USER_VIDEO_ENABLED = localOrDefault('user.video.enabled', process.env.USER_VIDEO_ENABLED);
+export const USER_AUDIO_ENABLED = localOrDefault('user.audio.enabled', process.env.USER_AUDIO_ENABLED);
+
+export const setLocalConfig = (key, value) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};

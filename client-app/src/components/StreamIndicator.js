@@ -46,7 +46,11 @@ const trackIcons = {
   }
 };
 
-const StreamIndicator = ({ streams = [] }) => {
+const StreamIndicator = ({
+  streams = [],
+  onAudioChange,
+  onVideoChange
+}) => {
   const classes = useStyles();
 
   const [tracksStatus, setTracksStatus] = useState({
@@ -80,7 +84,7 @@ const StreamIndicator = ({ streams = [] }) => {
 
   const handleTrackClick = useCallback(kind => () => {
     const track = tracksStatus[kind];
-    track.setEnabled(!track.enabled);
+    (kind === 'audio' ? onAudioChange : onVideoChange)(track.getStream())(!track.enabled);
   }, [tracksStatus]);
 
   return (

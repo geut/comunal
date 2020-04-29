@@ -15,6 +15,7 @@ import PeersIndicator from '../components/PeersIndicator';
 import StreamIndicator from '../components/StreamIndicator';
 
 import { notVisible, visible } from '../styles/helpers';
+import { USER_AUDIO_ENABLED, USER_VIDEO_ENABLED, setLocalConfig } from '../config';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -53,10 +54,22 @@ const Meeting = () => {
 
     const stream = await getUserMedia();
 
+    const audioTrack = stream.getActiveAudioTrack();
+    const videoTrack = stream.getActiveVideoTrack();
+
+    audioTrack.setEnabled(USER_AUDIO_ENABLED);
+    videoTrack.setEnabled(USER_VIDEO_ENABLED);
+
     setUserStreams(streams => ({
       ...streams,
       [stream.id]: stream
     }));
+  }, []);
+
+  const handleTrackChange = useCallback(type => stream => enabled => {
+    const track = stream.getActiveTrack(type);
+    track.setEnabled(enabled);
+    setLocalConfig(`user.${type}.enabled`, enabled);
   }, []);
 
   useEffect(() => {
@@ -66,11 +79,21 @@ const Meeting = () => {
   return (
     <FullSpace className={classes.root}>
       <Sidebar className='hideable'>
-        <PeersIndicator peers={Object.values(peers)} />
-        <StreamIndicator streams={Object.values(userStreams)} />
+        <PeersIndicator
+          peers={Object.values(peers)}
+        />
+        <StreamIndicator
+          streams={Object.values(userStreams)}
+          onAudioChange={handleTrackChange('audio')}
+          onVideoChange={handleTrackChange('video')}
+        />
       </Sidebar>
       <PeersView peers={Object.values(peers).filter(Boolean)} />
-      <UserView streams={Object.values(userStreams)} />
+      <UserView
+        streams={Object.values(userStreams)}
+        onAudioChange={handleTrackChange('audio')}
+        onVideoChange={handleTrackChange('video')}
+      />
     </FullSpace>
   );
 };

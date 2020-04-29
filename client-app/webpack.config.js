@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 const publicUrlOrPath = process.env.PUBLIC_URL || '';
 
@@ -37,11 +38,15 @@ module.exports = {
   },
 
   plugins: [
+    new Dotenv({
+      safe: true
+    }),
     new HtmlWebPackPlugin({
       template: './public/index.html',
       templateParameters: {
         PUBLIC_URL: publicUrlOrPath
-      }
+      },
+      favicon: './public/favicon.ico'
     })
   ],
 
